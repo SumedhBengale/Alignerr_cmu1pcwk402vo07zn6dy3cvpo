@@ -49,7 +49,7 @@ export function DeploymentsTable({ items, loading, filtered }: DeploymentsTableP
             items.map((d) => (
               <tr
                 key={d.id}
-                className="relative border-b border-slate-100 transition-colors last:border-b-0 hover:bg-slate-50/60 z-0"
+                className="relative border-b border-slate-100 transition-colors last:border-b-0 hover:bg-slate-50/60"
               >
                 <td className="px-4 py-3.5">
                   <p className="font-mono text-xs font-medium text-indigo-600">{d.commit}</p>
@@ -61,13 +61,13 @@ export function DeploymentsTable({ items, loading, filtered }: DeploymentsTableP
                 </td>
                 <td className="max-w-[230px] px-4 py-3.5">
                   <div className="flex items-start gap-2.5">
-                    <span className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600">
+                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600">
                       {initialsOf(d.triggeredBy)}
                     </span>
-                    <div className="relative">
-                      <div className="flex items-center">
-                        <p className="text-sm font-medium text-slate-800">{d.triggeredBy}</p>
-                        <div className="relative -ml-6 -top-1">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <p className="whitespace-nowrap text-sm font-medium text-slate-800">{d.triggeredBy}</p>
+                        <div className="max-w-full break-all">
                           <ItemTag icon={GitBranch} label={d.branch} />
                         </div>
                       </div>

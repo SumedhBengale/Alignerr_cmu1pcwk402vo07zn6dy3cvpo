@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   CheckCircle2,
   ChevronRight,
@@ -95,6 +96,13 @@ export function DeploymentTriggerModal({ open, onClose }: DeploymentTriggerModal
     return () => window.removeEventListener('keydown', onKey)
   }, [open, phase, onClose])
 
+  useEffect(() => {
+    if (!open) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previousOverflow }
+  }, [open])
+
   // Reset the form each time the modal is (re)opened.
   useEffect(() => {
     if (!open) return
@@ -186,8 +194,8 @@ export function DeploymentTriggerModal({ open, onClose }: DeploymentTriggerModal
     )
   }
 
-  return (
-    <div className="fixed inset-0 z-40 flex items-end justify-center p-0 sm:items-center sm:p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[60] flex items-end justify-center p-0 sm:items-center sm:p-4">
       <div
         className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"
         onClick={() => phase !== 'submitting' && onClose()}
@@ -197,10 +205,10 @@ export function DeploymentTriggerModal({ open, onClose }: DeploymentTriggerModal
         role="dialog"
         aria-modal="true"
         aria-label="Trigger new deployment"
-        className="relative flex max-h-[90vh] w-full max-w-lg animate-fade-in flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="relative flex max-h-[calc(100dvh-2rem)] w-full max-w-lg animate-fade-in flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
       >
-        <header className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5">
-          <div className="flex items-center gap-4">
+        <header className="flex shrink-0 items-center justify-between border-b border-slate-100 px-5 py-3.5">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-4">
             {stepIndicator(1, 'Service & branch')}
             <ChevronRight className="h-4 w-4 text-slate-300" />
             {stepIndicator(2, 'Build parameters')}
@@ -210,7 +218,7 @@ export function DeploymentTriggerModal({ open, onClose }: DeploymentTriggerModal
             onClick={onClose}
             disabled={phase === 'submitting'}
             aria-label="Close dialog"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40"
           >
             <X className="h-[18px] w-[18px]" />
           </button>
@@ -236,7 +244,7 @@ export function DeploymentTriggerModal({ open, onClose }: DeploymentTriggerModal
           </div>
         ) : (
           <>
-            <div className={`${step === 2 ? 'max-h-[300px] overflow-hidden' : 'min-h-0 flex-1 overflow-y-auto'} px-5 py-4`}>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4">
               {step === 1 ? (
                 <div className="space-y-4">
                   <div>
@@ -447,7 +455,7 @@ export function DeploymentTriggerModal({ open, onClose }: DeploymentTriggerModal
               )}
             </div>
 
-            <footer className="flex items-center justify-between border-t border-slate-100 bg-slate-50/60 px-5 py-3.5">
+            <footer className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t border-slate-100 bg-slate-50/60 px-5 py-3.5">
               <div className="flex items-center gap-2 text-sm">
                 {step === 2 && (
                   <button
@@ -501,6 +509,7 @@ export function DeploymentTriggerModal({ open, onClose }: DeploymentTriggerModal
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

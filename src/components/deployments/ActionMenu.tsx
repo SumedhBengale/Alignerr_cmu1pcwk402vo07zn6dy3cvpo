@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   Copy,
   ExternalLink,
@@ -7,7 +8,6 @@ import {
   Terminal,
   Undo2,
 } from 'lucide-react'
-import { useClickOutside } from '../../hooks/useClickOutside'
 import type { Deployment } from '../../lib/types'
 
 interface ActionMenuProps {
@@ -24,16 +24,52 @@ const ACTIONS: { kind: ActionKind; label: string; icon: typeof Copy }[] = [
   { kind: 'details', label: 'View run details', icon: ExternalLink },
 ]
 
-/**
- * Three-dot row action menu for the deployments table.
- *
- * NOTE: the menu is rendered inline (position: absolute) and relies on the
- * nearest positioned ancestor for stacking — no createPortal is used.
- */
 export function ActionMenu({ deployment }: ActionMenuProps) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
-  useClickOutside(rootRef, () => setOpen(false), open)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [position, setPosition] = useState({ top: 0, left: 0 })
+
+  useLayoutEffect(() => {
+    if (!open) return
+    const updatePosition = () => {
+      const anchor = rootRef.current?.getBoundingClientRect()
+      const menu = menuRef.current
+      if (!anchor || !menu) return
+      const gap = 4
+      const margin = 8
+      const height = menu.offsetHeight
+      const below = anchor.bottom + gap
+      const top = below + height <= window.innerHeight - margin
+        ? below
+        : anchor.top - gap - height
+      setPosition({
+        top: Math.max(margin, Math.min(top, window.innerHeight - height - margin)),
+        left: Math.max(margin, Math.min(anchor.right - menu.offsetWidth, window.innerWidth - menu.offsetWidth - margin)),
+      })
+    }
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node
+      if (!rootRef.current?.contains(target) && !menuRef.current?.contains(target)) setOpen(false)
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false)
+        rootRef.current?.querySelector('button')?.focus()
+      }
+    }
+    updatePosition()
+    window.addEventListener('resize', updatePosition)
+    window.addEventListener('scroll', updatePosition, true)
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      window.removeEventListener('resize', updatePosition)
+      window.removeEventListener('scroll', updatePosition, true)
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [open])
 
   return (
     <div ref={rootRef} className="relative inline-flex items-center justify-end">
@@ -53,11 +89,13 @@ export function ActionMenu({ deployment }: ActionMenuProps) {
         <MoreHorizontal className="h-[18px] w-[18px]" />
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
+          ref={menuRef}
+          style={position}
           role="menu"
           aria-label={`Actions for ${deployment.id}`}
-          className="absolute right-0 top-9 z-50 w-52 animate-fade-in overflow-hidden rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
+          className="fixed z-50 max-h-[calc(100dvh-1rem)] w-52 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
         >
           <p className="px-3 pb-1 pt-1.5 font-mono text-[11px] text-slate-400">
             {deployment.serviceName} · {deployment.commit}
@@ -78,7 +116,8 @@ export function ActionMenu({ deployment }: ActionMenuProps) {
               {label}
             </button>
           ))}
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   )
