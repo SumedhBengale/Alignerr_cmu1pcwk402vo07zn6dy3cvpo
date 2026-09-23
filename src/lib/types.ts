@@ -26,6 +26,7 @@ export interface Deployment {
   id: string
   commit: string
   commitMessage: string
+  branch: string
   serviceId: string
   serviceName: string
   triggeredBy: string

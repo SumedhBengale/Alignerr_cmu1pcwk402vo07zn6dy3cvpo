@@ -1,7 +1,8 @@
-import { SearchX } from 'lucide-react'
+import { GitBranch, SearchX } from 'lucide-react'
 import { formatRelativeTime, initialsOf } from '../../lib/format'
 import type { Deployment } from '../../lib/types'
 import { EmptyState } from '../ui/EmptyState'
+import { ItemTag } from '../ui/ItemTag'
 import { DeploymentStatusBadge, EnvironmentBadge } from '../ui/StatusBadges'
 import { ActionMenu } from './ActionMenu'
 
@@ -58,12 +59,20 @@ export function DeploymentsTable({ items, loading, filtered }: DeploymentsTableP
                   <p className="text-sm font-medium text-slate-800">{d.serviceName}</p>
                   <p className="text-xs text-slate-400">#{d.id.replace('dep-', '')}</p>
                 </td>
-                <td className="px-4 py-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600">
+                <td className="max-w-[230px] px-4 py-3.5">
+                  <div className="flex items-start gap-2.5">
+                    <span className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600">
                       {initialsOf(d.triggeredBy)}
                     </span>
-                    <span className="truncate text-sm text-slate-700">{d.triggeredBy}</span>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-medium text-slate-800">{d.triggeredBy}</p>
+                        <ItemTag icon={GitBranch} label={d.branch} />
+                      </div>
+                      <p className="mt-0.5 text-xs text-slate-400">
+                        #{d.id.replace('dep-', '')} · {d.trigger === 'push' ? 'CI run' : d.trigger === 'schedule' ? 'scheduled' : 'manual'}
+                      </p>
+                    </div>
                   </div>
                 </td>
                 <td className="px-4 py-3.5">
