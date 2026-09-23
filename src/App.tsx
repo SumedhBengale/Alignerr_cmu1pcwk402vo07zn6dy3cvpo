@@ -19,7 +19,7 @@ export default function App() {
   const renderView = () => {
     switch (view) {
       case 'dashboard':
-        return <DashboardView />
+        return <DashboardView team={team} />
       case 'deployments':
         return <DeploymentsView />
       case 'incidents':
