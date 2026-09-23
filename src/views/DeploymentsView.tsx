@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Rocket, Search } from 'lucide-react'
-import { ErrorState } from '../components/ui/ErrorState'
+import { Plus, Rocket, Search } from 'lucide-react'
 import { DeploymentsTable } from '../components/deployments/DeploymentsTable'
+import { DeploymentTriggerModal } from '../components/deployments/DeploymentTriggerModal'
+import { ErrorState } from '../components/ui/ErrorState'
 import { api } from '../services/apiClient'
 import { useAsync } from '../hooks/useAsync'
 import type { DeploymentStatus, Environment } from '../lib/types'
@@ -14,6 +15,7 @@ export function DeploymentsView() {
   const [status, setStatus] = useState<StatusFilter>('all')
   const [environment, setEnvironment] = useState<EnvironmentFilter>('all')
   const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [triggerOpen, setTriggerOpen] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 220)
@@ -49,6 +51,14 @@ export function DeploymentsView() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setTriggerOpen(true)}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+          >
+            <Plus className="h-4 w-4" />
+            Trigger new deployment
+          </button>
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
@@ -116,6 +126,8 @@ export function DeploymentsView() {
           </div>
         )}
       </div>
+
+      <DeploymentTriggerModal open={triggerOpen} onClose={() => setTriggerOpen(false)} />
     </div>
   )
 }

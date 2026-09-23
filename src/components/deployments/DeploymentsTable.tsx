@@ -3,6 +3,7 @@ import { formatRelativeTime, initialsOf } from '../../lib/format'
 import type { Deployment } from '../../lib/types'
 import { EmptyState } from '../ui/EmptyState'
 import { DeploymentStatusBadge, EnvironmentBadge } from '../ui/StatusBadges'
+import { ActionMenu } from './ActionMenu'
 
 interface DeploymentsTableProps {
   items: Deployment[]
@@ -10,19 +11,21 @@ interface DeploymentsTableProps {
   filtered: boolean
 }
 
-const HEADERS = ['Commit', 'Service', 'Triggered by', 'Status', 'Environment', 'Started']
+const HEADERS = ['Commit', 'Service', 'Triggered by', 'Status', 'Environment', 'Started', '']
 
 export function DeploymentsTable({ items, loading, filtered }: DeploymentsTableProps) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[720px] border-collapse text-left">
+    <div className="relative overflow-x-auto" style={{ overflowY: 'hidden' }}>
+      <table className="w-full min-w-[860px] border-collapse text-left">
         <thead>
           <tr className="border-b border-slate-200 bg-slate-50/70">
-            {HEADERS.map((header) => (
+            {HEADERS.map((header, index) => (
               <th
-                key={header}
+                key={index}
                 scope="col"
-                className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500"
+                className={`px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 ${
+                  index === HEADERS.length - 1 ? 'w-14 text-right' : ''
+                }`}
               >
                 {header}
               </th>
@@ -33,9 +36,9 @@ export function DeploymentsTable({ items, loading, filtered }: DeploymentsTableP
           {loading &&
             Array.from({ length: 6 }, (_, i) => (
               <tr key={`skeleton-${i}`} className="border-b border-slate-100 last:border-b-0">
-                {HEADERS.map((header) => (
-                  <td key={header} className="px-4 py-3.5">
-                    <div className="h-4 w-full animate-pulse rounded bg-slate-100" />
+                {HEADERS.map((_, col) => (
+                  <td key={col} className="px-4 py-3.5">
+                    <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100" />
                   </td>
                 ))}
               </tr>
@@ -57,7 +60,7 @@ export function DeploymentsTable({ items, loading, filtered }: DeploymentsTableP
                 </td>
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-2.5">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600">
                       {initialsOf(d.triggeredBy)}
                     </span>
                     <span className="truncate text-sm text-slate-700">{d.triggeredBy}</span>
@@ -71,6 +74,9 @@ export function DeploymentsTable({ items, loading, filtered }: DeploymentsTableP
                 </td>
                 <td className="whitespace-nowrap px-4 py-3.5 text-sm text-slate-500">
                   {formatRelativeTime(d.minutesAgo)}
+                </td>
+                <td className="px-4 py-3.5">
+                  <ActionMenu deployment={d} />
                 </td>
               </tr>
             ))}
