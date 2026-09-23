@@ -43,7 +43,11 @@ export default function App() {
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar view={view} team={team} onOpenMobileNav={() => setMenuOpen(true)} />
 
-        <main className="flex-1 p-4 sm:p-6">
+        {/* Transform creates a containing block and stacking context that traps fixed modals behind Topbar */}
+        <main
+          className="relative z-10 flex-1 p-4 sm:p-6"
+          style={{ transform: 'translate3d(0, 0, 0)' }}
+        >
           <div className="mx-auto max-w-6xl">{renderView()}</div>
         </main>
       </div>

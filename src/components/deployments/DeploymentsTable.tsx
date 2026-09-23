@@ -49,11 +49,11 @@ export function DeploymentsTable({ items, loading, filtered }: DeploymentsTableP
             items.map((d) => (
               <tr
                 key={d.id}
-                className="border-b border-slate-100 transition-colors last:border-b-0 hover:bg-slate-50/60"
+                className="relative border-b border-slate-100 transition-colors last:border-b-0 hover:bg-slate-50/60 z-0"
               >
-                <td className="max-w-[220px] px-4 py-3.5">
+                <td className="px-4 py-3.5">
                   <p className="font-mono text-xs font-medium text-indigo-600">{d.commit}</p>
-                  <p className="mt-0.5 truncate text-xs text-slate-500">{d.commitMessage}</p>
+                  <p className="mt-0.5 whitespace-nowrap text-xs text-slate-500">{d.commitMessage}</p>
                 </td>
                 <td className="px-4 py-3.5">
                   <p className="text-sm font-medium text-slate-800">{d.serviceName}</p>
@@ -64,10 +64,12 @@ export function DeploymentsTable({ items, loading, filtered }: DeploymentsTableP
                     <span className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600">
                       {initialsOf(d.triggeredBy)}
                     </span>
-                    <div>
-                      <div className="flex items-center gap-1.5">
+                    <div className="relative">
+                      <div className="flex items-center">
                         <p className="text-sm font-medium text-slate-800">{d.triggeredBy}</p>
-                        <ItemTag icon={GitBranch} label={d.branch} />
+                        <div className="relative -ml-6 -top-1">
+                          <ItemTag icon={GitBranch} label={d.branch} />
+                        </div>
                       </div>
                       <p className="mt-0.5 text-xs text-slate-400">
                         #{d.id.replace('dep-', '')} · {d.trigger === 'push' ? 'CI run' : d.trigger === 'schedule' ? 'scheduled' : 'manual'}

@@ -167,9 +167,9 @@ export function DeploymentTriggerModal({ open, onClose }: DeploymentTriggerModal
     const active = step === n
     const done = n === 1 && step === 2
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <span
-          className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
+          className={`flex h-6 min-w-[70px] items-center justify-center rounded-md px-1.5 text-xs font-semibold tracking-tight ${
             active
               ? 'bg-indigo-600 text-white'
               : done
@@ -177,9 +177,9 @@ export function DeploymentTriggerModal({ open, onClose }: DeploymentTriggerModal
                 : 'bg-slate-100 text-slate-400'
           }`}
         >
-          {done ? '✓' : n}
+          {done ? 'Step 1 ✓' : `Step ${n}`}
         </span>
-        <span className={`text-sm font-medium ${active ? 'text-slate-900' : 'text-slate-400'}`}>
+        <span className={`truncate text-sm font-medium ${active ? 'text-slate-900' : 'text-slate-400'}`}>
           {label}
         </span>
       </div>
@@ -236,7 +236,7 @@ export function DeploymentTriggerModal({ open, onClose }: DeploymentTriggerModal
           </div>
         ) : (
           <>
-            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+            <div className={`${step === 2 ? 'max-h-[300px] overflow-hidden' : 'min-h-0 flex-1 overflow-y-auto'} px-5 py-4`}>
               {step === 1 ? (
                 <div className="space-y-4">
                   <div>

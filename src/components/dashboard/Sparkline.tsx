@@ -29,7 +29,7 @@ export function Sparkline({ samples, positive, width = 120, height = 40 }: Spark
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
-      className="h-10 w-full"
+      className="absolute -bottom-3 -right-3 h-16 w-52 overflow-visible opacity-90"
       role="img"
       aria-label="30-day trend"
       preserveAspectRatio="none"
